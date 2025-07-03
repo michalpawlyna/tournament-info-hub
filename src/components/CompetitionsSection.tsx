@@ -1,46 +1,72 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { fetchCompetitions, Competition } from '@/services/api';
 
 const CompetitionsSection = () => {
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadCompetitions = async () => {
-      setLoading(true);
-      const data = await fetchCompetitions();
-      setCompetitions(data);
-      setLoading(false);
-    };
-
-    loadCompetitions();
-  }, []);
-
-  const handleDownloadRules = (competition: Competition) => {
-    if (competition.rules?.url) {
-      window.open(`http://localhost:3000${competition.rules.url}`, '_blank');
-    } else {
-      console.log(`Pobieranie regulaminu dla: ${competition.name}`);
-      // Fallback jeśli nie ma pliku
+  const competitions = [
+    {
+      id: 1,
+      name: "Sumo Robotów",
+      description: "Klasyczna konkurencja polegająca na wypchnięciu robota przeciwnika poza ring. Kategorie: Mini Sumo (1kg) i Mega Sumo (3kg).",
+      category: "Walka",
+      ageGroup: "12-18 lat",
+      participants: "64 robotów",
+      prize: "10 000 zł"
+    },
+    {
+      id: 2,
+      name: "Line Following",
+      description: "Robot musi jak najszybciej przejechać po wyznaczonej linii. Różne poziomy trudności tras z przeszkodami i skrzyżowaniami.",
+      category: "Programowanie",
+      ageGroup: "10-16 lat",
+      participants: "120 robotów",
+      prize: "8 000 zł"
+    },
+    {
+      id: 3,
+      name: "Freestyle",
+      description: "Pokaz kreatywności! Roboty prezentują swoje unikalne umiejętności w 3-minutowym występie ocenianym przez jury.",
+      category: "Kreatywność",
+      ageGroup: "8-18 lat",
+      participants: "45 robotów",
+      prize: "12 000 zł"
+    },
+    {
+      id: 4,
+      name: "Maze Solver",
+      description: "Autonomiczny robot musi znaleźć wyjście z labiryntu w jak najkrótszym czasie. Wykorzystuje algorytmy AI i czujniki.",
+      category: "AI & Algorytmy",
+      ageGroup: "14-20 lat",
+      participants: "32 robotów",
+      prize: "15 000 zł"
+    },
+    {
+      id: 5,
+      name: "Soccer Robots",
+      description: "Drużyny robotów grają w piłkę nożną na specjalnie przygotowanym boisku. Wymagana współpraca między robotami.",
+      category: "Teamwork",
+      ageGroup: "12-18 lat",
+      participants: "16 drużyn",
+      prize: "20 000 zł"
+    },
+    {
+      id: 6,
+      name: "Drone Racing",
+      description: "Wyścigi dronów na torze z przeszkodami. Kombinacja umiejętności pilotażu i konfiguracji technicznej drona.",
+      category: "Wyścigi",
+      ageGroup: "16-25 lat",
+      participants: "80 pilotów",
+      prize: "18 000 zł"
     }
-  };
+  ];
 
-  if (loading) {
-    return (
-      <section id="competitions" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-tech-cyan mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Ładowanie konkurencji...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const handleDownloadRules = (competitionName: string) => {
+    // Symulacja pobierania PDF
+    console.log(`Pobieranie regulaminu dla: ${competitionName}`);
+    // W rzeczywistej aplikacji tutaj byłby link do PDF
+  };
 
   return (
     <section id="competitions" className="py-20">
@@ -62,11 +88,9 @@ const CompetitionsSection = () => {
                   <span className="text-sm font-medium text-tech-cyan bg-tech-cyan/10 px-3 py-1 rounded-full">
                     {competition.category}
                   </span>
-                  {competition.ageGroup && (
-                    <span className="text-sm text-muted-foreground">
-                      {competition.ageGroup}
-                    </span>
-                  )}
+                  <span className="text-sm text-muted-foreground">
+                    {competition.ageGroup}
+                  </span>
                 </div>
                 <CardTitle className="text-xl font-bold group-hover:text-tech-cyan transition-colors">
                   {competition.name}
@@ -79,22 +103,18 @@ const CompetitionsSection = () => {
                 </p>
                 
                 <div className="space-y-2">
-                  {competition.participants && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Uczestnicy:</span>
-                      <span className="font-medium">{competition.participants}</span>
-                    </div>
-                  )}
-                  {competition.prize && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Nagroda:</span>
-                      <span className="font-bold text-tech-cyan">{competition.prize}</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Uczestnicy:</span>
+                    <span className="font-medium">{competition.participants}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Nagroda:</span>
+                    <span className="font-bold text-tech-cyan">{competition.prize}</span>
+                  </div>
                 </div>
 
                 <Button 
-                  onClick={() => handleDownloadRules(competition)}
+                  onClick={() => handleDownloadRules(competition.name)}
                   variant="outline" 
                   className="w-full border-tech-cyan/30 text-tech-cyan hover:bg-tech-cyan hover:text-background"
                 >
@@ -105,12 +125,6 @@ const CompetitionsSection = () => {
             </Card>
           ))}
         </div>
-
-        {competitions.length === 0 && !loading && (
-          <div className="text-center">
-            <p className="text-muted-foreground">Brak dostępnych konkurencji.</p>
-          </div>
-        )}
 
         <div className="text-center mt-16">
           <div className="bg-tech-gradient/10 rounded-2xl p-8 border border-tech-cyan/20">
