@@ -1,51 +1,34 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, AlertCircle, Star, Trophy } from 'lucide-react';
+import { Calendar, AlertCircle, Star, Trophy, Bell } from 'lucide-react';
+import { fetchAnnouncements, Announcement } from '@/services/api';
 
 const AnnouncementsSection = () => {
-  const announcements = [
-    {
-      id: 1,
-      title: "Przedłużono termin rejestracji!",
-      content: "Ze względu na duże zainteresowanie, przedłużamy termin rejestracji do 28 lutego 2024. Nie przegap swojej szansy na udział w największym turnieju robotyki!",
-      date: "2024-02-15",
-      type: "important",
-      icon: AlertCircle
-    },
-    {
-      id: 2,
-      title: "Nowy sponsor główny - TechCorp Solutions",
-      content: "Z radością ogłaszamy, że TechCorp Solutions zostało naszym głównym sponsorem! Dzięki temu nagrody w tym roku będą jeszcze atrakcyjniejsze.",
-      date: "2024-02-12",
-      type: "news",
-      icon: Star
-    },
-    {
-      id: 3,
-      title: "Aktualizacja regulaminu konkurencji Sumo",
-      content: "Wprowadziliśmy drobne zmiany w regulaminie konkurencji Sumo Robotów. Wszystkie zmiany zostały wyróżnione w nowej wersji dokumentu dostępnej do pobrania.",
-      date: "2024-02-10",
-      type: "update",
-      icon: Calendar
-    },
-    {
-      id: 4,
-      title: "Już 200 zarejestrowanych robotów!",
-      content: "Osiągnęliśmy kamień milowy - 200 zarejestrowanych robotów! Poziom tegorocznej rywalizacji będzie rekordowy. Gratulujemy wszystkim uczestnikom!",
-      date: "2024-02-08",
-      type: "milestone",
-      icon: Trophy
-    },
-    {
-      id: 5,
-      title: "Warsztaty przygotowawcze - 25 lutego",
-      content: "Organizujemy bezpłatne warsztaty przygotowawcze dla uczestników turnieju. Spotkamy się 25 lutego w Centrum Technologii Warszawskiej. Rejestracja na stronie partnera.",
-      date: "2024-02-05",
-      type: "event",
-      icon: Calendar
-    }
-  ];
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAnnouncements = async () => {
+      setLoading(true);
+      const data = await fetchAnnouncements();
+      setAnnouncements(data);
+      setLoading(false);
+    };
+
+    loadAnnouncements();
+  }, []);
+
+  const getTypeIcon = (type: string) => {
+    const icons = {
+      important: AlertCircle,
+      news: Star,
+      update: Calendar,
+      milestone: Trophy,
+      event: Calendar
+    };
+    return icons[type as keyof typeof icons] || Bell;
+  };
 
   const getTypeStyles = (type: string) => {
     const styles = {
@@ -78,6 +61,19 @@ const AnnouncementsSection = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <section className="py-20 bg-card/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-tech-cyan mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Ładowanie ogłoszeń...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-card/20">
       <div className="container mx-auto px-4">
@@ -92,7 +88,7 @@ const AnnouncementsSection = () => {
 
         <div className="max-w-4xl mx-auto space-y-6">
           {announcements.map((announcement) => {
-            const IconComponent = announcement.icon;
+            const IconComponent = getTypeIcon(announcement.type);
             return (
               <Card 
                 key={announcement.id} 
@@ -110,7 +106,7 @@ const AnnouncementsSection = () => {
                           {announcement.title}
                         </h3>
                         <span className="text-sm text-muted-foreground">
-                          {formatDate(announcement.date)}
+                          {formatDate(announcement.publishedAt)}
                         </span>
                       </div>
                       
@@ -124,6 +120,12 @@ const AnnouncementsSection = () => {
             );
           })}
         </div>
+
+        {announcements.length === 0 && !loading && (
+          <div className="text-center">
+            <p className="text-muted-foreground">Brak dostępnych ogłoszeń.</p>
+          </div>
+        )}
 
         <div className="text-center mt-12">
           <div className="bg-tech-gradient/10 rounded-2xl p-8 border border-tech-cyan/20 max-w-2xl mx-auto">
