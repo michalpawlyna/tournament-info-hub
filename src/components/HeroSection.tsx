@@ -7,7 +7,7 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Animation */}
-      <div className="absolute inset-0 bg-dark-gradient">
+      <div className="absolute inset-0 hero-gradient">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-72 h-72 bg-tech-cyan/20 rounded-full blur-3xl animate-float"></div>
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-tech-blue/20 rounded-full blur-3xl animate-float" style={{animationDelay: '1s'}}></div>
